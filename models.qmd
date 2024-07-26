@@ -13,4 +13,4 @@ execute:
 library(tidyverse)
 ```
 
-Our data is from a YouGov poll of 1,559 US adult citizens, conducted March 10 - 12, 2024. The question we seek to understand is what proportion of voters will support Biden in the 2024 election.
+Our data is from a YouGov poll of 1,559 US adult citizens, conducted March 10 - 12, 2024. The question we seek to understand is what proportion of voters will support Biden in the 2024 election. One concern is that the data may not be representative.
