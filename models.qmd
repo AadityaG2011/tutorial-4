@@ -11,6 +11,42 @@ execute:
 #| message: false
 
 library(tidyverse)
+library(brms)
+library(tidybayes)
+library(gtsummary)
 ```
 
-Our data is from a YouGov poll of 1,559 US adult citizens, conducted March 10 - 12, 2024. The question we seek to understand is what proportion of voters will support Biden in the 2024 election. One concern is that the data may not be representative.
+```{r}
+#| label: model
+#| cache: true
+
+poll_data <- tibble(biden = c(rep(1, 655), rep(0, 904)))
+
+fit_bern <- brm(formula = biden ~ 1, data = poll_data, family = bernoulli(), refresh = 0, silent = 2, seed = 9)
+```
+
+```{r}
+#| label: plot
+
+ndata <- tibble(.rows = 1)
+
+fit_bern |>
+add_epred_draws(newdata = ndata) |>
+select(.epred) |>
+ggplot(aes(x = .epred)) +
+geom_density(aes(y = after_stat(count / sum(count)))) +
+scale_x_continuous(labels = scales::percent_format()) +
+scale_y_continuous(labels = scales::percent_format()) +
+labs(title = expression(paste("Posterior Distribution for ", rho)),
+     subtitle = "There is a 95% chance for a value between 40% and 45%.",
+     x = expression(paste("Proportion ", rho, ", of Votes for Biden")),
+     y = "Probability")
+```
+
+Our data is from a YouGov poll of 1,559 US adult citizens, conducted March 10 - 12, 2024. The question we seek to understand is what proportion of voters will support Biden in the 2024 election. One concern is that the data may not be representative. The model is a Bernoulli distribution, created with the brm() function. The model and the actual data are very similar. About 42% of the votes were for Biden, with a 95% chance that the value was between 40% and 45%.
+
+$$ biden_i =  \mu + \epsilon_i $$
+
+```{r}
+slice_sample(poll_data, n = 10)
+```
